@@ -1,0 +1,104 @@
+---
+import type { Category } from '../lib/categories';
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props;
+---
+
+<div class="category-features" style={`--category-color: ${category.color}`}>
+  <div class="icon-wrapper">
+    <span class="icon">{category.icon}</span>
+  </div>
+  <div class="content">
+    <h3>{category.name}</h3>
+    <p>{category.description}</p>
+    <div class="topics">
+      <h4>Featured Topics:</h4>
+      <div class="topic-tags">
+        {category.featuredTopics.map(topic => (
+          <span class="topic-tag">{topic}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .category-features {
+    display: flex;
+    gap: 1.5rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    border-left: 4px solid var(--category-color);
+  }
+
+  .category-features:hover {
+    transform: translateY(-4px);
+  }
+
+  .icon-wrapper {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    background: var(--category-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon {
+    font-size: 2rem;
+  }
+
+  .content {
+    flex: 1;
+  }
+
+  h3 {
+    color: var(--category-color);
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: var(--color-gray);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  h4 {
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .topic-tag {
+    background: var(--color-light-gray);
+    color: var(--color-text);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    transition: background-color 0.3s;
+  }
+
+  .topic-tag:hover {
+    background: var(--category-color);
+    color: white;
+  }
+
+  :global(.dark) .category-features {
+    background: var(--color-dark-bg);
+  }
+</style>

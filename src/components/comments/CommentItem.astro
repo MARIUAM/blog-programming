@@ -1,0 +1,225 @@
+---
+import type { Comment } from '../../lib/types';
+import { formatDate } from '../../lib/utils';
+import CommentForm from './CommentForm.astro';
+
+interface Props {
+  comment: Comment;
+  replies: Comment[];
+  postId: string;
+}
+
+const { comment, replies, postId } = Astro.props;
+---
+
+<div class="comment" data-comment-id={comment.id}>
+  <div class="comment-header">
+    <img src={comment.author.avatar} alt={comment.author.name} class="avatar" />
+    <span class="author">{comment.author.name}</span>
+    <span class="date">{formatDate(comment.createdAt)}</span>
+  </div>
+  
+  <div class="comment-content">
+    <p>{comment.content}</p>
+  </div>
+  
+  <div class="comment-actions">
+    <button class="like-btn" data-likes={comment.likes}>
+      <span class="like-icon">♥</span>
+      <span class="like-count">{comment.likes}</span>
+    </button>
+    <button class="reply-btn">Reply</button>
+    {comment.isAuthor && (
+      <>
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+      </>
+    )}
+  </div>
+
+  <div class="reply-form hidden">
+    <CommentForm postId={postId} replyTo={comment.id} />
+  </div>
+
+  {replies.length > 0 && (
+    <div class="replies">
+      {replies.map(reply => (
+        <CommentItem 
+          comment={reply}
+          replies={[]}
+          postId={postId}
+        />
+      ))}
+    </div>
+  )}
+</div>
+
+<script>
+  function setupCommentActions() {
+    document.querySelectorAll('.comment').forEach(comment => {
+      const commentId = comment.dataset.commentId;
+      const likeBtn = comment.querySelector('.like-btn');
+      const replyBtn = comment.querySelector('.reply-btn');
+      const editBtn = comment.querySelector('.edit-btn');
+      const deleteBtn = comment.querySelector('.delete-btn');
+      const replyForm = comment.querySelector('.reply-form');
+      
+      // Like button
+      likeBtn?.addEventListener('click', async () => {
+        try {
+          const response = await fetch(`/api/comments/${commentId}/like`, {
+            method: 'POST'
+          });
+          if (!response.ok) throw new Error('Failed to like comment');
+          
+          const { likes } = await response.json();
+          const likeCount = likeBtn.querySelector('.like-count');
+          if (likeCount) likeCount.textContent = likes;
+        } catch (error) {
+          console.error('Error liking comment:', error);
+        }
+      });
+
+      // Reply button
+      replyBtn?.addEventListener('click', () => {
+        replyForm?.classList.toggle('hidden');
+      });
+
+      // Edit button
+      editBtn?.addEventListener('click', async () => {
+        const content = comment.querySelector('.comment-content p');
+        if (!content) return;
+
+        const currentText = content.textContent;
+        const textarea = document.createElement('textarea');
+        textarea.value = currentText || '';
+        content.replaceWith(textarea);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Save';
+        saveBtn.className = 'btn save-btn';
+        editBtn.replaceWith(saveBtn);
+
+        saveBtn.addEventListener('click', async () => {
+          try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: textarea.value }),
+            });
+
+            if (!response.ok) throw new Error('Failed to update comment');
+
+            const p = document.createElement('p');
+            p.textContent = textarea.value;
+            textarea.replaceWith(p);
+            saveBtn.replaceWith(editBtn);
+          } catch (error) {
+            console.error('Error updating comment:', error);
+          }
+        });
+      });
+
+      // Delete button
+      deleteBtn?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+
+        try {
+          const response = await fetch(`/api/comments/${commentId}`, {
+            method: 'DELETE'
+          });
+          if (!response.ok) throw new Error('Failed to delete comment');
+          
+          comment.remove();
+        } catch (error) {
+          console.error('Error deleting comment:', error);
+        }
+      });
+    });
+  }
+
+  // Setup initial comment actions
+  setupCommentActions();
+
+  // Setup comment actions for new comments
+  document.addEventListener('comments:refresh', setupCommentActions);
+</script>
+
+<style>
+  .comment {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .author {
+    font-weight: 500;
+    color: var(--color-primary);
+  }
+
+  .date {
+    color: var(--color-gray);
+    font-size: 0.875rem;
+  }
+
+  .comment-content {
+    margin: 0.5rem 0;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .comment-actions button {
+    background: none;
+    border: none;
+    color: var(--color-gray);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0;
+  }
+
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .like-btn.liked {
+    color: #ff4b4b;
+  }
+
+  .replies {
+    margin-left: 2rem;
+    margin-top: 1rem;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .save-btn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  :global(.dark) .comment {
+    background: var(--color-dark-bg);
+  }
+</style>

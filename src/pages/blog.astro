@@ -1,0 +1,63 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { fetchBlogPosts } from '../lib/api';
+import type { BlogPost } from '../lib/types';
+
+let posts: BlogPost[] = [];
+try {
+  posts = await fetchBlogPosts();
+} catch (error) {
+  console.error('Error loading blog posts:', error);
+}
+---
+
+<Layout title="Blog">
+  <div class="container">
+    <h1>Latest Development Posts</h1>
+    <div class="blog-grid">
+      {posts.length > 0 ? (
+        posts.map(post => (
+          <a href={`/blog/${post.id}`} class="blog-link">
+            <BlogCard {...post} />
+          </a>
+        ))
+      ) : (
+        <p class="no-posts">No posts available at the moment. Please check back later.</p>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    margin: 2rem 0;
+    color: var(--color-primary);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  .blog-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+  }
+
+  .blog-link:hover {
+    transform: translateY(-4px);
+  }
+
+  .no-posts {
+    text-align: center;
+    color: var(--color-gray);
+    grid-column: 1 / -1;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+  }
+</style>

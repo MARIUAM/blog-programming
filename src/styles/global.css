@@ -1,0 +1,74 @@
+:root {
+  --color-primary: #ff6b35;
+  --color-primary-light: #ff8c61;
+  --color-background: #faf9f8;
+  --color-text: #2d2d2d;
+  --color-gray: #666666;
+  --color-light-gray: #f0f0f0;
+  --color-dark-bg: #1a1a1a;
+  --color-dark-text: #ffffff;
+}
+
+/* Dark theme variables */
+:root.dark {
+  --color-background: #1a1a1a;
+  --color-text: #ffffff;
+  --color-gray: #a0a0a0;
+  --color-light-gray: #2d2d2d;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.btn {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* Responsive utilities */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    width: 100%;
+    padding: 0 1.5rem;
+  }
+}

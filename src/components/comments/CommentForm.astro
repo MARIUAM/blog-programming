@@ -1,0 +1,72 @@
+---
+interface Props {
+  postId: string;
+  replyTo?: string;
+}
+
+const { postId, replyTo } = Astro.props;
+---
+
+<form class="comment-form" data-post-id={postId} data-reply-to={replyTo}>
+  <textarea 
+    placeholder="Write your comment..." 
+    required 
+    minlength="3"
+    maxlength="1000"
+    rows="3"
+  ></textarea>
+  <button type="submit" class="btn">Post Comment</button>
+</form>
+
+<script>
+  const forms = document.querySelectorAll('.comment-form');
+
+  forms.forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const textarea = form.querySelector('textarea');
+      if (!textarea) return;
+
+      const postId = form.dataset.postId;
+      const replyTo = form.dataset.replyTo;
+      const content = textarea.value;
+
+      try {
+        const response = await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, content, replyTo }),
+        });
+
+        if (!response.ok) throw new Error('Failed to post comment');
+
+        // Reset form and refresh comments
+        textarea.value = '';
+        document.dispatchEvent(new CustomEvent('comments:refresh'));
+      } catch (error) {
+        console.error('Error posting comment:', error);
+      }
+    });
+  });
+</script>
+
+<style>
+  .comment-form {
+    margin-bottom: 1.5rem;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-light-gray);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    resize: vertical;
+  }
+
+  textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+</style>

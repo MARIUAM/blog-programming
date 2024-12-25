@@ -1,0 +1,36 @@
+---
+import type { Comment } from '../../lib/types';
+import CommentItem from './CommentItem.astro';
+
+interface Props {
+  comments: Comment[];
+  postId: string;
+}
+
+const { comments, postId } = Astro.props;
+
+// Group comments by parent
+const parentComments = comments.filter(c => !c.parentId);
+const replies = comments.filter(c => c.parentId);
+const replyMap = new Map();
+replies.forEach(reply => {
+  const parentReplies = replyMap.get(reply.parentId) || [];
+  replyMap.set(reply.parentId, [...parentReplies, reply]);
+});
+---
+
+<div class="comments-section">
+  {parentComments.map(comment => (
+    <CommentItem 
+      comment={comment}
+      replies={replyMap.get(comment.id) || []}
+      postId={postId}
+    />
+  ))}
+</div>
+
+<style>
+  .comments-section {
+    margin-top: 2rem;
+  }
+</style>

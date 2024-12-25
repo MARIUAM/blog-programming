@@ -1,0 +1,169 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { categories } from '../../lib/categories';
+import { fetchPostsByCategory } from '../../lib/api';
+
+const { slug } = Astro.params;
+
+// Find the category
+const category = categories.find(c => c.slug === slug);
+
+// Redirect to 404 if category doesn't exist
+if (!category) {
+  return Astro.redirect('/404');
+}
+
+// Fetch posts for this category
+const posts = await fetchPostsByCategory(category.slug);
+---
+
+<Layout title={category.name}>
+  <div class="container">
+    <header class="category-header" style={`--category-color: ${category.color}`}>
+      <div class="icon-wrapper">
+        <span class="icon">{category.icon}</span>
+      </div>
+      <h1>{category.name}</h1>
+      <p>{category.description}</p>
+    </header>
+
+    <div class="featured-topics">
+      <h2>Featured Topics</h2>
+      <div class="topic-tags">
+        {category.featuredTopics.map(topic => (
+          <span class="topic-tag" style={`--category-color: ${category.color}`}>
+            {topic}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <section class="posts-section">
+      <h2>Latest Articles</h2>
+      <div class="posts-grid">
+        {posts.length > 0 ? (
+          posts.map(post => (
+            <a href={`/blog/${post.id}`} class="post-link">
+              <BlogCard {...post} />
+            </a>
+          ))
+        ) : (
+          <p class="no-posts">No posts available in this category yet.</p>
+        )}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .category-header {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: var(--category-color);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .icon {
+    font-size: 2.5rem;
+  }
+
+  h1 {
+    color: var(--category-color);
+    font-size: 2.5rem;
+    margin: 0 0 1rem;
+  }
+
+  .category-header p {
+    color: var(--color-gray);
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .featured-topics {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  h2 {
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .topic-tag {
+    background: var(--color-light-gray);
+    color: var(--color-text);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .topic-tag:hover {
+    background: var(--category-color);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .post-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+  }
+
+  .post-link:hover {
+    transform: translateY(-4px);
+  }
+
+  .no-posts {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    grid-column: 1 / -1;
+    color: var(--color-gray);
+  }
+
+  @media (max-width: 768px) {
+    .category-header {
+      padding: 2rem 0;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .category-header p {
+      font-size: 1.125rem;
+    }
+  }
+
+  :global(.dark) .no-posts {
+    background: var(--color-dark-bg);
+  }
+</style>

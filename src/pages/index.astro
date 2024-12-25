@@ -1,0 +1,171 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FeaturedPost from '../components/FeaturedPost.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import { fetchBlogPosts } from '../lib/api';
+
+const posts = await fetchBlogPosts();
+const featuredPosts = posts.slice(0, 5);
+---
+
+<Layout title="Home">
+  <div class="container">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Discover the World of Development</h1>
+        <p>Expert insights, tutorials, and best practices from the development community.</p>
+        <div class="cta-buttons">
+          <a href="/blog" class="btn">Start Reading</a>
+          <a href="/categories" class="btn btn-secondary">Browse Topics</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img 
+          src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=800&q=80" 
+          alt="Developer working on code"
+          width="800"
+          height="600"
+        />
+      </div>
+    </section>
+
+    <section class="featured-posts">
+      <h2>Featured Articles</h2>
+      <div class="post-grid">
+        {featuredPosts.map((post, index) => (
+          <FeaturedPost post={post} featured={index === 0} />
+        ))}
+      </div>
+    </section>
+
+    <section class="newsletter-section">
+      <NewsletterSignup />
+    </section>
+
+    <section class="categories-preview">
+      <h2>Popular Topics</h2>
+      <div class="topic-buttons">
+        <a href="/category/web-development" class="topic-btn">Web Development</a>
+        <a href="/category/mobile-development" class="topic-btn">Mobile Development</a>
+        <a href="/category/artificial-intelligence" class="topic-btn">AI & ML</a>
+        <a href="/category/devops" class="topic-btn">DevOps</a>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 4rem 0;
+    margin-bottom: 4rem;
+  }
+
+  .hero-content h1 {
+    color: var(--color-primary);
+    font-size: 3.5rem;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-content p {
+    color: var(--color-gray);
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .hero-image {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .hero-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .featured-posts {
+    margin-bottom: 4rem;
+  }
+
+  h2 {
+    color: var(--color-primary);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .newsletter-section {
+    margin: 4rem 0;
+  }
+
+  .categories-preview {
+    margin-bottom: 4rem;
+  }
+
+  .topic-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .topic-btn {
+    background: white;
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-light-gray);
+  }
+
+  .topic-btn:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-content h1 {
+      font-size: 2.5rem;
+    }
+
+    .cta-buttons {
+      justify-content: center;
+    }
+
+    .post-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

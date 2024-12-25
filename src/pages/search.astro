@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Search">
+  <div class="container">
+    <h1>Search</h1>
+    <div class="search-content">
+      <div class="search-box">
+        <input type="text" placeholder="Search articles..." id="search-input">
+        <button class="btn">Search</button>
+      </div>
+      <div id="search-results" class="search-results">
+        <!-- Search results will be displayed here -->
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    color: var(--color-primary);
+    margin: 2rem 0;
+  }
+
+  .search-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 4rem;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .search-box input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--color-light-gray);
+    border-radius: 4px;
+  }
+
+  .search-results {
+    min-height: 200px;
+  }
+</style>

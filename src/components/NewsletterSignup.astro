@@ -1,0 +1,100 @@
+---
+---
+
+<div class="newsletter">
+  <h3>Subscribe to Our Newsletter</h3>
+  <p>Get the latest articles and resources directly in your inbox.</p>
+  <form id="newsletter-form" class="signup-form">
+    <input 
+      type="email" 
+      placeholder="Enter your email" 
+      required
+      aria-label="Email address"
+    />
+    <button type="submit" class="btn">Subscribe</button>
+  </form>
+  <div id="newsletter-status" class="status"></div>
+</div>
+
+<script>
+  const form = document.getElementById('newsletter-form');
+  const status = document.getElementById('newsletter-status');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (e.target as HTMLFormElement).querySelector('input')?.value;
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (status) {
+        status.textContent = 'Thanks for subscribing!';
+        status.className = 'status success';
+        (e.target as HTMLFormElement).reset();
+        
+        setTimeout(() => {
+          status.textContent = '';
+          status.className = 'status';
+        }, 3000);
+      }
+    } catch (error) {
+      if (status) {
+        status.textContent = 'Failed to subscribe. Please try again.';
+        status.className = 'status error';
+      }
+    }
+  });
+</script>
+
+<style>
+  .newsletter {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  h3 {
+    color: var(--color-primary);
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    color: var(--color-gray);
+    margin-bottom: 1.5rem;
+  }
+
+  .signup-form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--color-light-gray);
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+
+  input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+
+  .status {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .success {
+    color: #22c55e;
+  }
+
+  .error {
+    color: #ef4444;
+  }
+</style>

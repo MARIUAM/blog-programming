@@ -1,0 +1,181 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CategoryFeatures from '../components/CategoryFeatures.astro';
+import { categories } from '../lib/categories';
+import { fetchPostsByCategory } from '../lib/api';
+
+// Fetch latest post count for each category
+const categoryPostCounts = await Promise.all(
+  categories.map(async (category) => {
+    const posts = await fetchPostsByCategory(category.slug);
+    return { slug: category.slug, count: posts.length };
+  })
+);
+
+const getCategoryPostCount = (slug: string) => {
+  return categoryPostCounts.find(c => c.slug === slug)?.count || 0;
+};
+---
+
+<Layout title="Categories">
+  <div class="container">
+    <section class="categories-header">
+      <h1>Explore Topics</h1>
+      <p>Dive deep into your favorite technology topics with our curated content</p>
+    </section>
+
+    <div class="search-section">
+      <input 
+        type="text" 
+        id="category-search" 
+        placeholder="Search topics..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="categories-grid">
+      {categories.map(category => (
+        <a href={`/category/${category.slug}`} class="category-link">
+          <CategoryFeatures category={category} />
+          <div class="post-count" style={`--category-color: ${category.color}`}>
+            {getCategoryPostCount(category.slug)} articles
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <section class="categories-footer">
+      <h2>Want to Contribute?</h2>
+      <p>Share your knowledge and experience with our growing community of developers.</p>
+      <div class="cta-buttons">
+        <a href="/write" class="btn">Write an Article</a>
+        <a href="/contact" class="btn btn-secondary">Suggest a Topic</a>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .categories-header {
+    text-align: center;
+    margin: 3rem 0;
+  }
+
+  h1 {
+    color: var(--color-primary);
+    font-size: 2.5rem;
+    margin: 0 0 1rem;
+  }
+
+  .categories-header p {
+    color: var(--color-gray);
+    font-size: 1.25rem;
+  }
+
+  .search-section {
+    margin-bottom: 2rem;
+  }
+
+  .search-input {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: block;
+    padding: 1rem;
+    border: 2px solid var(--color-light-gray);
+    border-radius: 8px;
+    font-size: 1.125rem;
+    transition: border-color 0.3s;
+  }
+
+  .search-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  .category-link {
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+
+  .post-count {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--category-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+  }
+
+  .categories-footer {
+    text-align: center;
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    margin: 4rem 0;
+  }
+
+  .categories-footer h2 {
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .categories-footer p {
+    color: var(--color-gray);
+    margin-bottom: 2rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .btn-secondary {
+    background: var(--color-light-gray);
+    color: var(--color-text);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-gray);
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  :global(.dark) .categories-footer {
+    background: var(--color-dark-bg);
+  }
+</style>
+
+<script>
+  const searchInput = document.getElementById('category-search');
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  searchInput?.addEventListener('input', (e) => {
+    const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+
+    categoryLinks.forEach(link => {
+      const categoryContent = link.textContent?.toLowerCase() || '';
+      if (categoryContent.includes(searchTerm)) {
+        link.classList.remove('hidden');
+      } else {
+        link.classList.add('hidden');
+      }
+    });
+  });
+</script>

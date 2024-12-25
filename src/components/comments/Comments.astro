@@ -1,0 +1,58 @@
+---
+import type { Comment } from '../../lib/types';
+import CommentForm from './CommentForm.astro';
+import CommentList from './CommentList.astro';
+
+interface Props {
+  postId: string;
+  initialComments: Comment[];
+}
+
+const { postId, initialComments } = Astro.props;
+const isLoggedIn = true; // Replace with actual auth check
+---
+
+<section class="comments-section">
+  <h2>Comments</h2>
+  
+  {isLoggedIn ? (
+    <CommentForm postId={postId} />
+  ) : (
+    <p class="login-prompt">
+      Please <a href="/login">log in</a> to leave a comment.
+    </p>
+  )}
+  
+  <CommentList comments={initialComments} postId={postId} />
+</section>
+
+<style>
+  .comments-section {
+    margin-top: 3rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+  }
+
+  .login-prompt {
+    text-align: center;
+    padding: 1rem;
+    background: var(--color-light-gray);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+
+  .login-prompt a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  :global(.dark) .comments-section {
+    background: var(--color-dark-bg);
+  }
+</style>

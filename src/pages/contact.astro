@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+
+<Layout title="Contact Us">
+  <div class="container">
+    <h1>Contact Us</h1>
+    <div class="contact-content">
+      <p class="contact-intro">Have questions or suggestions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+      <ContactForm />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    color: var(--color-primary);
+    margin: 2rem 0;
+  }
+
+  .contact-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 4rem;
+  }
+
+  .contact-intro {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    color: var(--color-gray);
+  }
+</style>
